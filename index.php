@@ -17,11 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $sort_by = $_GET['sort_by'] ?? 'date';
 $flight_id = isset($_GET['flight_id']) && $_GET['flight_id'] !== '' ? (int)$_GET['flight_id'] : null;
 $status = $_GET['status'] ?? null;
-$search = $_GET['search'] ?? null;
 
 $claims = getLostLuggageClaims($pdo, $sort_by, $flight_id, $status);
 $flights = getFlightsForFilter($pdo);
-$unclaimed_luggage = getUnclaimedLuggage($pdo, $search);
+$unclaimed_luggage = getUnclaimedLuggage($pdo);
 $claims_without_luggage = getClaimsWithoutLuggage($pdo);
 $statistics = getClaimsStatistics($pdo);
 
@@ -364,19 +363,6 @@ $statistics = getClaimsStatistics($pdo);
         
         <div id="luggage" class="tab-content">
             <h2>Бесхозный багаж</h2>
-            
-            <div class="filters">
-                <form method="GET" action="">
-                    <input type="hidden" name="tab" value="luggage">
-                    <div class="form-group" style="flex: 1;">
-                        <label>Поиск по описанию:</label>
-                        <input type="text" name="search" value="<?php echo htmlspecialchars($search ?? ''); ?>" 
-                               placeholder="Введите ключевые слова...">
-                    </div>
-                    <button type="submit" class="btn">Поиск</button>
-                    <a href="index.php?tab=luggage" class="btn">Сбросить</a>
-                </form>
-            </div>
             
             <table>
                 <thead>

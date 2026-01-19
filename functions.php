@@ -78,8 +78,8 @@ function getFlightsForFilter($pdo) {
     return $stmt->fetchAll();
 }
 
-function getUnclaimedLuggage($pdo, $search = null) {
-    $sql = "
+function getUnclaimedLuggage($pdo) {
+    $stmt = $pdo->query("
         SELECT 
             u.luggage_id,
             u.claim_id,
@@ -90,20 +90,8 @@ function getUnclaimedLuggage($pdo, $search = null) {
             c.passenger_surname || ' ' || c.passenger_name || COALESCE(' ' || c.passenger_patronymic, '') as passenger_name
         FROM bookings.unclaimed_luggage u
         LEFT JOIN bookings.lost_luggage_claims c ON u.claim_id = c.claim_id
-        WHERE 1=1
-    ";
-    
-    $params = [];
-    
-    if ($search !== null && $search !== '') {
-        $sql .= " AND to_tsvector('russian', u.description) @@ plainto_tsquery('russian', :search)";
-        $params['search'] = $search;
-    }
-    
-    $sql .= " ORDER BY u.receipt_date DESC";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
+        ORDER BY u.receipt_date DESC
+    ");
     return $stmt->fetchAll();
 }
 
