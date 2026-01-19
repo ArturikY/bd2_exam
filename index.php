@@ -22,7 +22,6 @@ $claims = getLostLuggageClaims($pdo, $sort_by, $flight_id, $status);
 $flights = getFlightsForFilter($pdo);
 $unclaimed_luggage = getUnclaimedLuggage($pdo);
 $claims_without_luggage = getClaimsWithoutLuggage($pdo);
-$statistics = getClaimsStatistics($pdo);
 
 ?>
 <!DOCTYPE html>
@@ -254,15 +253,6 @@ $statistics = getClaimsStatistics($pdo);
                 <?php echo htmlspecialchars($message); ?>
             </div>
         <?php endif; ?>
-        
-        <div class="stats">
-            <?php foreach ($statistics as $stat): ?>
-                <div class="stat-card">
-                    <h3><?php echo htmlspecialchars($stat['status']); ?></h3>
-                    <div class="value"><?php echo $stat['count']; ?></div>
-                </div>
-            <?php endforeach; ?>
-        </div>
         
         <div class="tabs">
             <button class="tab active">Заявки на поиск</button>
