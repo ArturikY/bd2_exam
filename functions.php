@@ -24,15 +24,16 @@ function getLostLuggageClaims($pdo, $sort_by = 'date', $flight_id = null, $statu
             c.baggage_description,
             c.claim_date,
             c.status,
-            f.flight_no,
+            r.route_no,
             f.scheduled_departure,
             dep.airport_name->>'ru' as departure_airport,
             arr.airport_name->>'ru' as arrival_airport,
             t.passenger_name as ticket_passenger_name
         FROM bookings.lost_luggage_claims c
         JOIN bookings.flights f ON c.flight_id = f.flight_id
-        JOIN bookings.airports_data dep ON f.departure_airport = dep.airport_code
-        JOIN bookings.airports_data arr ON f.arrival_airport = arr.airport_code
+        JOIN bookings.routes r ON f.route_no = r.route_no
+        JOIN bookings.airports_data dep ON r.departure_airport = dep.airport_code
+        JOIN bookings.airports_data arr ON r.arrival_airport = arr.airport_code
         LEFT JOIN bookings.tickets t ON c.ticket_no = t.ticket_no
         WHERE 1=1
     ";
@@ -52,7 +53,7 @@ function getLostLuggageClaims($pdo, $sort_by = 'date', $flight_id = null, $statu
     // Сортировка
     switch ($sort_by) {
         case 'flight':
-            $sql .= " ORDER BY f.flight_no, c.claim_date DESC";
+            $sql .= " ORDER BY r.route_no, c.claim_date DESC";
             break;
         case 'status':
             $sql .= " ORDER BY c.status, c.claim_date DESC";
@@ -77,14 +78,15 @@ function getFlightsForFilter($pdo) {
     $stmt = $pdo->query("
         SELECT DISTINCT
             f.flight_id,
-            f.flight_no,
+            r.route_no,
             f.scheduled_departure,
             dep.airport_name->>'ru' as departure_airport,
             arr.airport_name->>'ru' as arrival_airport
         FROM bookings.flights f
         JOIN bookings.lost_luggage_claims c ON f.flight_id = c.flight_id
-        JOIN bookings.airports_data dep ON f.departure_airport = dep.airport_code
-        JOIN bookings.airports_data arr ON f.arrival_airport = arr.airport_code
+        JOIN bookings.routes r ON f.route_no = r.route_no
+        JOIN bookings.airports_data dep ON r.departure_airport = dep.airport_code
+        JOIN bookings.airports_data arr ON r.arrival_airport = arr.airport_code
         ORDER BY f.scheduled_departure DESC
     ");
     return $stmt->fetchAll();

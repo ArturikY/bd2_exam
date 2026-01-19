@@ -297,7 +297,7 @@ $statistics = getClaimsStatistics($pdo);
                             <?php foreach ($flights as $flight): ?>
                                 <option value="<?php echo $flight['flight_id']; ?>" 
                                     <?php echo $flight_id == $flight['flight_id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($flight['flight_no'] . ' - ' . $flight['departure_airport'] . ' → ' . $flight['arrival_airport']); ?>
+                                    <?php echo htmlspecialchars($flight['route_no'] . ' - ' . $flight['departure_airport'] . ' → ' . $flight['arrival_airport']); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -340,7 +340,7 @@ $statistics = getClaimsStatistics($pdo);
                             <tr>
                                 <td><?php echo $claim['claim_id']; ?></td>
                                 <td>
-                                    <?php echo htmlspecialchars($claim['flight_no']); ?><br>
+                                    <?php echo htmlspecialchars($claim['route_no'] ?? 'N/A'); ?><br>
                                     <small><?php echo htmlspecialchars($claim['departure_airport'] . ' → ' . $claim['arrival_airport']); ?></small>
                                 </td>
                                 <td>
