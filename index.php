@@ -3,15 +3,13 @@
 require_once 'config.php';
 require_once 'functions.php';
 
-$airports = getAirports($pdo, 10);
-
 ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Экзамен - Базы данных</title>
+    <title>Экзамен - База данных</title>
     <style>
         * {
             margin: 0;
@@ -48,72 +46,17 @@ $airports = getAirports($pdo, 10);
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        th {
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
-        }
-        
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .airport-code {
-            font-weight: bold;
-            color: #007bff;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Аэропорты</h1>
+        <h1>Hello!</h1>
         
         <div class="status">
             ✅ Подключение к базе данных установлено
         </div>
         
-        <?php if (!empty($airports)): ?>
-            <h2>Первые 10 аэропортов</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Код</th>
-                        <th>Название</th>
-                        <th>Город</th>
-                        <th>Страна</th>
-                        <th>Координаты</th>
-                        <th>Часовой пояс</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($airports as $airport): ?>
-                        <tr>
-                            <td class="airport-code"><?php echo htmlspecialchars($airport['airport_code'] ?? ''); ?></td>
-                            <td><?php echo htmlspecialchars($airport['airport_name'] ?? 'Нет данных'); ?></td>
-                            <td><?php echo htmlspecialchars($airport['city'] ?? 'Нет данных'); ?></td>
-                            <td><?php echo htmlspecialchars($airport['country'] ?? 'Нет данных'); ?></td>
-                            <td><?php echo htmlspecialchars($airport['coordinates'] ?? 'Нет данных'); ?></td>
-                            <td><?php echo htmlspecialchars($airport['timezone'] ?? 'Нет данных'); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php else: ?>
-            <p>Аэропорты не найдены или произошла ошибка при получении данных.</p>
-        <?php endif; ?>
+        <p>Приложение готово к работе.</p>
     </div>
 </body>
 </html>
