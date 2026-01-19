@@ -29,11 +29,11 @@ function getLostLuggageClaims($pdo, $sort_by = 'date', $flight_id = null, $statu
             dep.airport_name->>'ru' as departure_airport,
             arr.airport_name->>'ru' as arrival_airport,
             t.passenger_name as ticket_passenger_name
-        FROM lost_luggage_claims c
-        JOIN flights f ON c.flight_id = f.flight_id
-        JOIN airports_data dep ON f.departure_airport = dep.airport_code
-        JOIN airports_data arr ON f.arrival_airport = arr.airport_code
-        LEFT JOIN tickets t ON c.ticket_no = t.ticket_no
+        FROM bookings.lost_luggage_claims c
+        JOIN bookings.flights f ON c.flight_id = f.flight_id
+        JOIN bookings.airports_data dep ON f.departure_airport = dep.airport_code
+        JOIN bookings.airports_data arr ON f.arrival_airport = arr.airport_code
+        LEFT JOIN bookings.tickets t ON c.ticket_no = t.ticket_no
         WHERE 1=1
     ";
     
@@ -81,10 +81,10 @@ function getFlightsForFilter($pdo) {
             f.scheduled_departure,
             dep.airport_name->>'ru' as departure_airport,
             arr.airport_name->>'ru' as arrival_airport
-        FROM flights f
-        JOIN lost_luggage_claims c ON f.flight_id = c.flight_id
-        JOIN airports_data dep ON f.departure_airport = dep.airport_code
-        JOIN airports_data arr ON f.arrival_airport = arr.airport_code
+        FROM bookings.flights f
+        JOIN bookings.lost_luggage_claims c ON f.flight_id = c.flight_id
+        JOIN bookings.airports_data dep ON f.departure_airport = dep.airport_code
+        JOIN bookings.airports_data arr ON f.arrival_airport = arr.airport_code
         ORDER BY f.scheduled_departure DESC
     ");
     return $stmt->fetchAll();
@@ -106,8 +106,8 @@ function getUnclaimedLuggage($pdo, $search = null) {
             u.receipt_date,
             c.baggage_tag_no,
             c.passenger_surname || ' ' || c.passenger_name || COALESCE(' ' || c.passenger_patronymic, '') as passenger_name
-        FROM unclaimed_luggage u
-        LEFT JOIN lost_luggage_claims c ON u.claim_id = c.claim_id
+        FROM bookings.unclaimed_luggage u
+        LEFT JOIN bookings.lost_luggage_claims c ON u.claim_id = c.claim_id
         WHERE 1=1
     ";
     
@@ -138,8 +138,8 @@ function getClaimsWithoutLuggage($pdo) {
             c.passenger_surname || ' ' || c.passenger_name || COALESCE(' ' || c.passenger_patronymic, '') as passenger_name,
             c.baggage_description,
             c.status
-        FROM lost_luggage_claims c
-        LEFT JOIN unclaimed_luggage u ON c.claim_id = u.claim_id
+        FROM bookings.lost_luggage_claims c
+        LEFT JOIN bookings.unclaimed_luggage u ON c.claim_id = u.claim_id
         WHERE u.claim_id IS NULL
           AND c.status = 'заявка принята'
         ORDER BY c.claim_date DESC
@@ -159,7 +159,7 @@ function linkLuggageToClaim($pdo, $luggage_id, $claim_id) {
         $pdo->beginTransaction();
         
         // Проверить, что заявка существует
-        $stmt = $pdo->prepare("SELECT claim_id FROM lost_luggage_claims WHERE claim_id = :claim_id");
+        $stmt = $pdo->prepare("SELECT claim_id FROM bookings.lost_luggage_claims WHERE claim_id = :claim_id");
         $stmt->execute(['claim_id' => $claim_id]);
         if (!$stmt->fetch()) {
             throw new Exception("Заявка не найдена");
@@ -167,7 +167,7 @@ function linkLuggageToClaim($pdo, $luggage_id, $claim_id) {
         
         // Обновить связь
         $stmt = $pdo->prepare("
-            UPDATE unclaimed_luggage 
+            UPDATE bookings.unclaimed_luggage 
             SET claim_id = :claim_id 
             WHERE luggage_id = :luggage_id
         ");
@@ -178,7 +178,7 @@ function linkLuggageToClaim($pdo, $luggage_id, $claim_id) {
         
         // Обновить статус заявки
         $stmt = $pdo->prepare("
-            UPDATE lost_luggage_claims 
+            UPDATE bookings.lost_luggage_claims 
             SET status = 'багаж найден' 
             WHERE claim_id = :claim_id
         ");
@@ -212,7 +212,7 @@ function getClaimsStatistics($pdo) {
         SELECT 
             status,
             COUNT(*) as count
-        FROM lost_luggage_claims
+        FROM bookings.lost_luggage_claims
         GROUP BY status
     ");
     return $stmt->fetchAll();
