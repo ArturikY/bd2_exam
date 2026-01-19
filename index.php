@@ -93,6 +93,7 @@ $airports = getAirports($pdo, 10);
                         <th>Код</th>
                         <th>Название</th>
                         <th>Город</th>
+                        <th>Страна</th>
                         <th>Координаты</th>
                         <th>Часовой пояс</th>
                     </tr>
@@ -103,6 +104,7 @@ $airports = getAirports($pdo, 10);
                             <td class="airport-code"><?php echo htmlspecialchars($airport['airport_code'] ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($airport['airport_name'] ?? 'Нет данных'); ?></td>
                             <td><?php echo htmlspecialchars($airport['city'] ?? 'Нет данных'); ?></td>
+                            <td><?php echo htmlspecialchars($airport['country'] ?? 'Нет данных'); ?></td>
                             <td><?php echo htmlspecialchars($airport['coordinates'] ?? 'Нет данных'); ?></td>
                             <td><?php echo htmlspecialchars($airport['timezone'] ?? 'Нет данных'); ?></td>
                         </tr>
