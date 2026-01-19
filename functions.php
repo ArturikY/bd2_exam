@@ -2,14 +2,6 @@
 
 require_once 'config.php';
 
-/**
- * Получить список заявок на поиск пропавшего багажа
- * @param PDO $pdo
- * @param string|null $sort_by - сортировка: 'flight', 'status', 'date'
- * @param int|null $flight_id - фильтр по рейсу
- * @param string|null $status - фильтр по статусу
- * @return array
- */
 function getLostLuggageClaims($pdo, $sort_by = 'date', $flight_id = null, $status = null) {
     $sql = "
         SELECT 
@@ -50,7 +42,6 @@ function getLostLuggageClaims($pdo, $sort_by = 'date', $flight_id = null, $statu
         $params['status'] = $status;
     }
     
-    // Сортировка
     switch ($sort_by) {
         case 'flight':
             $sql .= " ORDER BY r.route_no, c.claim_date DESC";
@@ -69,11 +60,6 @@ function getLostLuggageClaims($pdo, $sort_by = 'date', $flight_id = null, $statu
     return $stmt->fetchAll();
 }
 
-/**
- * Получить список всех рейсов для фильтра
- * @param PDO $pdo
- * @return array
- */
 function getFlightsForFilter($pdo) {
     $stmt = $pdo->query("
         SELECT DISTINCT
@@ -92,12 +78,6 @@ function getFlightsForFilter($pdo) {
     return $stmt->fetchAll();
 }
 
-/**
- * Получить список бесхозного багажа
- * @param PDO $pdo
- * @param string|null $search - поиск по ключевым словам
- * @return array
- */
 function getUnclaimedLuggage($pdo, $search = null) {
     $sql = "
         SELECT 
@@ -127,11 +107,6 @@ function getUnclaimedLuggage($pdo, $search = null) {
     return $stmt->fetchAll();
 }
 
-/**
- * Получить список заявок без связанного багажа (для связывания)
- * @param PDO $pdo
- * @return array
- */
 function getClaimsWithoutLuggage($pdo) {
     $stmt = $pdo->query("
         SELECT 
@@ -149,25 +124,16 @@ function getClaimsWithoutLuggage($pdo) {
     return $stmt->fetchAll();
 }
 
-/**
- * Связать бесхозный багаж с заявкой
- * @param PDO $pdo
- * @param int $luggage_id
- * @param int $claim_id
- * @return array ['success' => bool, 'message' => string]
- */
 function linkLuggageToClaim($pdo, $luggage_id, $claim_id) {
     try {
         $pdo->beginTransaction();
         
-        // Проверить, что заявка существует
         $stmt = $pdo->prepare("SELECT claim_id FROM bookings.lost_luggage_claims WHERE claim_id = :claim_id");
         $stmt->execute(['claim_id' => $claim_id]);
         if (!$stmt->fetch()) {
             throw new Exception("Заявка не найдена");
         }
         
-        // Обновить связь
         $stmt = $pdo->prepare("
             UPDATE bookings.unclaimed_luggage 
             SET claim_id = :claim_id 
@@ -178,7 +144,6 @@ function linkLuggageToClaim($pdo, $luggage_id, $claim_id) {
             'claim_id' => $claim_id
         ]);
         
-        // Обновить статус заявки
         $stmt = $pdo->prepare("
             UPDATE bookings.lost_luggage_claims 
             SET status = 'багаж найден' 
@@ -204,11 +169,6 @@ function linkLuggageToClaim($pdo, $luggage_id, $claim_id) {
     }
 }
 
-/**
- * Получить статистику по заявкам
- * @param PDO $pdo
- * @return array
- */
 function getClaimsStatistics($pdo) {
     $stmt = $pdo->query("
         SELECT 

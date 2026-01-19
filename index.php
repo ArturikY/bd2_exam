@@ -3,7 +3,6 @@
 require_once 'config.php';
 require_once 'functions.php';
 
-// Обработка действий
 $message = '';
 $message_type = '';
 
@@ -15,13 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Получение параметров фильтрации и сортировки
 $sort_by = $_GET['sort_by'] ?? 'date';
 $flight_id = isset($_GET['flight_id']) && $_GET['flight_id'] !== '' ? (int)$_GET['flight_id'] : null;
 $status = $_GET['status'] ?? null;
 $search = $_GET['search'] ?? null;
 
-// Получение данных
 $claims = getLostLuggageClaims($pdo, $sort_by, $flight_id, $status);
 $flights = getFlightsForFilter($pdo);
 $unclaimed_luggage = getUnclaimedLuggage($pdo, $search);
@@ -259,7 +256,6 @@ $statistics = getClaimsStatistics($pdo);
             </div>
         <?php endif; ?>
         
-        <!-- Статистика -->
         <div class="stats">
             <?php foreach ($statistics as $stat): ?>
                 <div class="stat-card">
@@ -269,13 +265,11 @@ $statistics = getClaimsStatistics($pdo);
             <?php endforeach; ?>
         </div>
         
-        <!-- Вкладки -->
         <div class="tabs">
             <button class="tab active">Заявки на поиск</button>
             <button class="tab">Бесхозный багаж</button>
         </div>
         
-        <!-- Вкладка: Заявки -->
         <div id="claims" class="tab-content active">
             <h2>Заявки на поиск пропавшего багажа</h2>
             
@@ -368,7 +362,6 @@ $statistics = getClaimsStatistics($pdo);
             </table>
         </div>
         
-        <!-- Вкладка: Бесхозный багаж -->
         <div id="luggage" class="tab-content">
             <h2>Бесхозный багаж</h2>
             
@@ -450,7 +443,6 @@ $statistics = getClaimsStatistics($pdo);
     
     <script>
         function showTab(tabName, element) {
-            // Скрыть все вкладки
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -458,14 +450,12 @@ $statistics = getClaimsStatistics($pdo);
                 tab.classList.remove('active');
             });
             
-            // Показать выбранную вкладку
             document.getElementById(tabName).classList.add('active');
             if (element) {
                 element.classList.add('active');
             }
         }
         
-        // Привязка обработчиков к кнопкам вкладок
         document.querySelectorAll('.tab').forEach(button => {
             button.addEventListener('click', function() {
                 const tabName = this.textContent.includes('Заявки') ? 'claims' : 'luggage';
@@ -473,7 +463,6 @@ $statistics = getClaimsStatistics($pdo);
             });
         });
         
-        // При загрузке страницы показать нужную вкладку
         const urlParams = new URLSearchParams(window.location.search);
         const tab = urlParams.get('tab');
         if (tab === 'luggage') {
